@@ -4,342 +4,441 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SignalScope - AI Media Forensics</title>
+    <!-- Use Plus Jakarta Sans for that modern agency feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        unfold: {
+                            black: '#09090b',
+                            dark: '#18181b',
+                            card: '#1f1f22',
+                            accent: '#4f46e5', // Indigo
+                            glow: '#c084fc', // Purple
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            background-color: #09090b;
             color: #f8fafc;
-            font-family: 'Inter', -apple-system, sans-serif;
-            min-height: 100vh;
+            overflow-x: hidden;
         }
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
+        
+        /* Glowing Orbs */
+        .glow-orb-1 {
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(79,70,229,0.15) 0%, rgba(9,9,11,0) 70%);
+            z-index: -1;
+            filter: blur(40px);
         }
+        
+        .glow-orb-2 {
+            position: absolute;
+            bottom: -200px;
+            right: -100px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(192,132,252,0.1) 0%, rgba(9,9,11,0) 70%);
+            z-index: -1;
+            filter: blur(60px);
+        }
+
+        /* Sleek Bento Cards */
+        .bento-card {
+            background: #18181b;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .bento-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Drop Zone */
         .drop-zone {
-            border: 2px dashed rgba(148, 163, 184, 0.4);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
             transition: all 0.3s ease;
         }
         .drop-zone.dragover {
-            border-color: #60a5fa;
-            background: rgba(96, 165, 250, 0.1);
+            border-color: #4f46e5;
+            background: rgba(79, 70, 229, 0.05);
         }
-        .verdict-ai { color: #f87171; }
-        .verdict-real { color: #4ade80; }
-        .verdict-uncertain { color: #fbbf24; }
+
+        /* Pills & Typography */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Verdict Colors */
+        .verdict-ai { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+        .verdict-real { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+        .verdict-uncertain { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
         
+        /* Loader */
         .loader {
-            border: 4px solid rgba(255,255,255,0.1);
-            border-top: 4px solid #60a5fa;
+            border: 3px solid rgba(255,255,255,0.05);
+            border-top: 3px solid #4f46e5;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Custom Scrollbar for inner elements */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
     </style>
 </head>
-<body class="p-6 md:p-12">
+<body class="min-h-screen relative font-sans selection:bg-indigo-500 selection:text-white">
 
-<div class="max-w-5xl mx-auto">
-    <!-- Header -->
-    <header class="text-center mb-10">
-        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-            <i class="fa-solid fa-radar-base mr-2"></i>SignalScope
-        </h1>
-        <p class="text-slate-300 text-lg">AI Media Authenticity Analysis Platform</p>
-    </header>
+    <!-- Background Elements -->
+    <div class="glow-orb-1"></div>
+    <div class="glow-orb-2"></div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="max-w-6xl mx-auto px-6 py-12 md:py-16">
         
-        <!-- Input Section -->
-        <div class="glass-panel p-6 flex flex-col h-full">
-            <h2 class="text-xl font-bold mb-4 border-b border-slate-600 pb-2">1. Upload Media</h2>
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-12">
+            <div>
+                <div class="pill bg-white/5 text-white/60 mb-3 border border-white/10">
+                    <i class="fa-solid fa-bolt text-indigo-400 mr-2"></i> SignalScope v2.0
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-2">
+                    AI Media Forensics.
+                </h1>
+                <p class="text-zinc-400 text-lg">Next-gen synthesis detection engineered for the intelligent era.</p>
+            </div>
             
-            <div id="drop-zone" class="drop-zone flex-grow flex flex-col items-center justify-center rounded-xl p-8 mb-4 cursor-pointer hover:bg-slate-800/50">
-                <i class="fa-solid fa-cloud-arrow-up text-5xl text-slate-400 mb-4"></i>
-                <p class="text-slate-300 font-medium mb-1">Drag & drop an image here</p>
-                <p class="text-slate-500 text-sm mb-4">or click to browse files</p>
-                <input type="file" id="file-input" class="hidden" accept="image/*">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition">
-                    Browse Files
+            <div class="mt-6 md:mt-0 flex space-x-3">
+                <a href="#" class="px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-semibold transition">
+                    Documentation
+                </a>
+                <button class="px-5 py-2.5 rounded-full bg-white text-black hover:bg-zinc-200 text-sm font-semibold transition shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                    API Access
                 </button>
             </div>
-            
-            <div id="preview-container" class="hidden flex-grow flex-col items-center justify-center mb-4 relative">
-                <img id="image-preview" class="max-h-64 rounded-lg object-contain bg-black/30 w-full" src="" alt="Preview">
-                <button id="remove-btn" class="absolute top-2 right-2 bg-red-500/80 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-sm">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
+        </header>
 
-            <div class="mb-4">
-                <label class="block text-sm text-slate-300 mb-1">Optional Context/Caption</label>
-                <input type="text" id="caption-input" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500" placeholder="e.g. A photo of a handmade ceramic mug">
-            </div>
-
-            <button id="analyze-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 px-4 rounded-lg shadow-lg transform transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                Analyze Image
-            </button>
-        </div>
-
-        <!-- Output Section -->
-        <div class="glass-panel p-6 h-full flex flex-col relative">
-            <h2 class="text-xl font-bold mb-4 border-b border-slate-600 pb-2">2. Analysis Results</h2>
+        <!-- Main Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Default State -->
-            <div id="default-state" class="flex-grow flex flex-col items-center justify-center text-slate-500 text-center h-64">
-                <i class="fa-solid fa-microscope text-5xl mb-4 opacity-50"></i>
-                <p>Upload an image and click analyze<br>to see forensic results here.</p>
-            </div>
-            
-            <!-- Loading State -->
-            <div id="loading-state" class="hidden flex-grow flex flex-col items-center justify-center text-center h-64">
-                <div class="loader mb-4"></div>
-                <p class="text-blue-400 font-medium animate-pulse">Running Multi-Expert Forensics...</p>
-                <p class="text-slate-500 text-sm mt-2">Extracting spatial and frequency artifacts</p>
-            </div>
-            
-            <!-- Results State -->
-            <div id="results-state" class="hidden flex-col flex-grow overflow-y-auto pr-2 custom-scrollbar">
+            <!-- Left Column: Input (Takes up 5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
                 
-                <div class="bg-slate-800/80 rounded-xl p-5 mb-4 border border-slate-700 text-center">
-                    <h3 class="text-sm text-slate-400 uppercase tracking-wider font-bold mb-1">Final Verdict</h3>
-                    <div id="verdict-text" class="text-3xl font-extrabold mb-2 verdict-ai">LIKELY AI-GENERATED</div>
-                    <div class="flex items-center justify-center space-x-2">
-                        <span class="text-slate-300">Calibrated Confidence:</span>
-                        <span id="confidence-text" class="font-bold text-lg">88.5%</span>
+                <!-- Upload Bento -->
+                <div class="bento-card p-6 flex flex-col flex-grow">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-lg font-bold text-white">Input Media</h2>
+                        <span class="text-xs font-semibold text-zinc-500 bg-zinc-800/50 px-3 py-1 rounded-full">JPG, PNG, WEBP</span>
                     </div>
-                </div>
-
-                <div class="mb-4">
-                    <h3 class="font-bold text-slate-200 mb-2"><i class="fa-solid fa-eye mr-2 text-blue-400"></i>Visual Evidence & Multi-Spectral Analysis</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-black/40 rounded-lg p-2 border border-slate-700 flex flex-col">
-                            <p class="text-xs text-center text-slate-400 font-bold mb-1">Grad-CAM Spatial</p>
-                            <img id="heatmap-preview" class="w-full rounded object-contain max-h-40 flex-grow" src="" alt="Heatmap Evidence">
+                    
+                    <div id="drop-zone" class="drop-zone flex-grow flex flex-col items-center justify-center p-10 cursor-pointer hover:bg-white/[0.02]">
+                        <div class="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center mb-4 text-indigo-400 text-2xl shadow-[0_0_20px_rgba(79,70,229,0.15)]">
+                            <i class="fa-solid fa-arrow-up-from-bracket"></i>
                         </div>
-                        <div class="bg-black/40 rounded-lg p-2 border border-slate-700 flex flex-col">
-                            <p class="text-xs text-center text-slate-400 font-bold mb-1">Frequency Spectrum (2D FFT)</p>
-                            <img id="freq-preview" class="w-full rounded object-contain max-h-40 flex-grow" src="" alt="Frequency Evidence">
+                        <h3 class="text-white font-bold mb-1">Upload an image</h3>
+                        <p class="text-zinc-500 text-sm text-center">Drag and drop here, or click to browse files.</p>
+                        <input type="file" id="file-input" class="hidden" accept="image/*">
+                    </div>
+                    
+                    <!-- Preview Container -->
+                    <div id="preview-container" class="hidden flex-col items-center justify-center relative bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex-grow">
+                        <img id="image-preview" class="w-full h-full object-contain max-h-64" src="" alt="Preview">
+                        <button id="remove-btn" class="absolute top-4 right-4 bg-black/60 hover:bg-black text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md transition">
+                            <i class="fa-solid fa-xmark text-sm"></i>
+                        </button>
+                    </div>
+
+                    <button id="analyze-btn" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
+                        <span>Analyze Media</span>
+                        <i class="fa-solid fa-arrow-right ml-2 text-sm opacity-80"></i>
+                    </button>
+                </div>
+
+                <!-- Metadata / Input details Bento -->
+                <div class="bento-card p-6">
+                    <label class="block text-sm font-bold text-white mb-2">Metadata Context</label>
+                    <input type="text" id="caption-input" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" placeholder="Optional context (e.g. 'Campaign hero image')">
+                </div>
+            </div>
+
+            <!-- Right Column: Output (Takes up 7 cols) -->
+            <div class="lg:col-span-7 bento-card p-6 md:p-8 flex flex-col relative overflow-hidden">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-lg font-bold text-white">Forensic Analysis</h2>
+                    <div class="flex space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse hidden" id="live-indicator"></span>
+                    </div>
+                </div>
+                
+                <!-- Default State -->
+                <div id="default-state" class="flex-grow flex flex-col items-center justify-center text-zinc-500">
+                    <div class="w-20 h-20 rounded-full border border-zinc-800 flex items-center justify-center mb-6">
+                        <i class="fa-solid fa-fingerprint text-3xl opacity-40"></i>
+                    </div>
+                    <h3 class="text-white font-bold mb-2">Awaiting Image</h3>
+                    <p class="text-sm text-center max-w-sm">Upload media to instantly scan for deepfake artifacts, frequency anomalies, and generative signatures.</p>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="loading-state" class="hidden flex-grow flex-col items-center justify-center text-center">
+                    <div class="loader mb-6"></div>
+                    <h3 class="text-white font-bold mb-2">Scanning Topology</h3>
+                    <p class="text-zinc-500 text-sm">Extracting spatial gradients and performing 2D FFT...</p>
+                </div>
+                
+                <!-- Results State -->
+                <div id="results-state" class="hidden flex-col flex-grow overflow-y-auto custom-scroll pr-2">
+                    
+                    <!-- Verdict Hero -->
+                    <div class="bg-black/40 rounded-2xl p-6 mb-6 border border-white/5 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Final Verdict</p>
+                            <h2 id="verdict-text" class="text-3xl md:text-4xl font-extrabold tracking-tight">LIKELY AI</h2>
                         </div>
-                        <div class="bg-black/40 rounded-lg p-2 border border-slate-700 flex flex-col">
-                            <p class="text-xs text-center text-slate-400 font-bold mb-1">Error Level Analysis (ELA)</p>
-                            <img id="ela-preview" class="w-full rounded object-contain max-h-40 flex-grow" src="" alt="ELA Evidence">
+                        <div class="text-right">
+                            <p class="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Confidence</p>
+                            <div class="text-3xl md:text-4xl font-extrabold text-white" id="confidence-text">98.5%</div>
                         </div>
                     </div>
-                </div>
 
-                <div class="mb-4">
-                    <h3 class="font-bold text-slate-200 mb-2"><i class="fa-solid fa-align-left mr-2 text-blue-400"></i>Explanation</h3>
-                    <div class="bg-slate-800/50 rounded-lg p-4 text-slate-300 text-sm leading-relaxed" id="explanation-text">
-                        The system detected anomalies consistent with synthesis. Several localized high-frequency regions contributed to the AI-generated score.
+                    <!-- Explanation -->
+                    <div class="mb-8">
+                        <h3 class="text-sm font-bold text-white mb-3 flex items-center">
+                            <i class="fa-solid fa-bolt text-indigo-400 mr-2"></i> Diagnosis
+                        </h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed bg-white/[0.02] p-4 rounded-xl border border-white/5" id="explanation-text">
+                            The system detected anomalies.
+                        </p>
                     </div>
-                </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div class="bg-slate-800/50 rounded-lg p-4">
-                        <h3 class="font-bold text-slate-200 mb-1 text-sm"><i class="fa-solid fa-shield-halved mr-2 text-purple-400"></i>Robustness</h3>
-                        <ul id="robustness-list" class="text-sm text-slate-400 space-y-1 mt-2">
-                            <!-- populated by JS -->
-                        </ul>
-                    </div>
-                    <div class="bg-slate-800/50 rounded-lg p-4">
-                        <h3 class="font-bold text-slate-200 mb-1 text-sm"><i class="fa-solid fa-fingerprint mr-2 text-green-400"></i>Provenance</h3>
-                        <ul id="provenance-list" class="text-sm text-slate-400 space-y-1 mt-2">
-                            <!-- populated by JS -->
-                        </ul>
-                    </div>
-                </div>
+                    <!-- Bento Grid for Multi-Spectral Evidence -->
+                    <h3 class="text-sm font-bold text-white mb-3 flex items-center">
+                        <i class="fa-solid fa-layer-group text-purple-400 mr-2"></i> Multi-Spectral Evidence
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        
+                        <!-- Grad CAM -->
+                        <div class="bg-black/30 rounded-xl overflow-hidden border border-white/5 flex flex-col">
+                            <div class="p-3 border-b border-white/5 bg-white/[0.02]">
+                                <p class="text-xs font-bold text-zinc-300 text-center">Spatial Activation</p>
+                            </div>
+                            <div class="p-2 flex-grow flex items-center justify-center">
+                                <img id="heatmap-preview" class="w-full h-32 object-cover rounded-lg mix-blend-screen" src="" alt="Heatmap">
+                            </div>
+                        </div>
 
-                <div class="mt-auto pt-4 border-t border-slate-700">
-                    <p class="text-xs text-slate-500 text-center italic">
-                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>
-                        This system provides a likelihood assessment based on visual and provenance signals. It is not definitive proof of image origin.
-                    </p>
+                        <!-- Frequency -->
+                        <div class="bg-black/30 rounded-xl overflow-hidden border border-white/5 flex flex-col">
+                            <div class="p-3 border-b border-white/5 bg-white/[0.02]">
+                                <p class="text-xs font-bold text-zinc-300 text-center">2D FFT Spectrum</p>
+                            </div>
+                            <div class="p-2 flex-grow flex items-center justify-center bg-black">
+                                <img id="freq-preview" class="w-full h-32 object-cover rounded-lg" src="" alt="Frequency">
+                            </div>
+                        </div>
+
+                        <!-- ELA -->
+                        <div class="bg-black/30 rounded-xl overflow-hidden border border-white/5 flex flex-col">
+                            <div class="p-3 border-b border-white/5 bg-white/[0.02]">
+                                <p class="text-xs font-bold text-zinc-300 text-center">Error Level (ELA)</p>
+                            </div>
+                            <div class="p-2 flex-grow flex items-center justify-center bg-black">
+                                <img id="ela-preview" class="w-full h-32 object-cover rounded-lg" src="" alt="ELA">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Details -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+                            <p class="text-xs font-bold text-zinc-500 uppercase mb-2">Robustness Checks</p>
+                            <ul id="robustness-list" class="text-sm font-medium text-zinc-300 space-y-2"></ul>
+                        </div>
+                        <div class="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+                            <p class="text-xs font-bold text-zinc-500 uppercase mb-2">Metadata & C2PA</p>
+                            <ul id="provenance-list" class="text-sm font-medium text-zinc-300 space-y-2"></ul>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('file-input');
-    const previewContainer = document.getElementById('preview-container');
-    const imagePreview = document.getElementById('image-preview');
-    const removeBtn = document.getElementById('remove-btn');
-    const analyzeBtn = document.getElementById('analyze-btn');
-    const captionInput = document.getElementById('caption-input');
-    
-    const defaultState = document.getElementById('default-state');
-    const loadingState = document.getElementById('loading-state');
-    const resultsState = document.getElementById('results-state');
-
-    let currentFile = null;
-
-    // File selection handling
-    dropZone.addEventListener('click', () => fileInput.click());
-    
-    dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('dragover');
-    });
-    
-    dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('dragover');
-    });
-    
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('dragover');
-        if (e.dataTransfer.files.length) {
-            handleFile(e.dataTransfer.files[0]);
-        }
-    });
-
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length) {
-            handleFile(e.target.files[0]);
-        }
-    });
-
-    removeBtn.addEventListener('click', () => {
-        currentFile = null;
-        fileInput.value = '';
-        previewContainer.classList.add('hidden');
-        dropZone.classList.remove('hidden');
+    <!-- Scripts -->
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const removeBtn = document.getElementById('remove-btn');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const captionInput = document.getElementById('caption-input');
         
-        // Reset results area
-        resultsState.classList.add('hidden');
-        defaultState.classList.remove('hidden');
-    });
+        const defaultState = document.getElementById('default-state');
+        const loadingState = document.getElementById('loading-state');
+        const resultsState = document.getElementById('results-state');
+        const liveIndicator = document.getElementById('live-indicator');
 
-    function handleFile(file) {
-        if (!file.type.startsWith('image/')) {
-            alert('Please select an image file.');
-            return;
+        let currentFile = null;
+
+        // File Selection
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+        removeBtn.addEventListener('click', () => {
+            currentFile = null;
+            fileInput.value = '';
+            previewContainer.classList.add('hidden');
+            previewContainer.classList.remove('flex');
+            dropZone.classList.remove('hidden');
+            dropZone.classList.add('flex');
+            resultsState.classList.add('hidden');
+            resultsState.classList.remove('flex');
+            defaultState.classList.remove('hidden');
+            defaultState.classList.add('flex');
+            liveIndicator.classList.add('hidden');
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) return alert('Please select an image file.');
+            currentFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                dropZone.classList.add('hidden');
+                dropZone.classList.remove('flex');
+                previewContainer.classList.remove('hidden');
+                previewContainer.classList.add('flex');
+            };
+            reader.readAsDataURL(file);
         }
-        currentFile = file;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            imagePreview.src = e.target.result;
-            dropZone.classList.add('hidden');
-            previewContainer.classList.remove('hidden');
-            previewContainer.classList.add('flex');
-        };
-        reader.readAsDataURL(file);
-    }
 
-    // Analysis handling
-    analyzeBtn.addEventListener('click', async () => {
-        if (!currentFile) {
-            alert('Please select an image first.');
-            return;
-        }
+        // Analysis
+        analyzeBtn.addEventListener('click', async () => {
+            if (!currentFile) return;
 
-        // Show loading
-        defaultState.classList.add('hidden');
-        resultsState.classList.add('hidden');
-        loadingState.classList.remove('hidden');
-        loadingState.classList.add('flex');
-        analyzeBtn.disabled = true;
-
-        const formData = new FormData();
-        formData.append('file', currentFile);
-        if (captionInput.value) {
-            formData.append('caption', captionInput.value);
-        }
-
-        try {
-            // Call our FastAPI backend
-            const response = await fetch('/api/v1/predict', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error('Analysis failed');
-            }
-
-            const data = await response.json();
-            displayResults(data);
+            // UI State updates
+            defaultState.classList.add('hidden');
+            defaultState.classList.remove('flex');
+            resultsState.classList.add('hidden');
+            resultsState.classList.remove('flex');
+            loadingState.classList.remove('hidden');
+            loadingState.classList.add('flex');
+            liveIndicator.classList.remove('hidden');
             
-        } catch (error) {
-            alert('An error occurred during analysis. Please try again.');
-            console.error(error);
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = `<div class="loader !w-5 !h-5 !border-2"></div>`;
+
+            const formData = new FormData();
+            formData.append('file', currentFile);
+            if (captionInput.value) formData.append('caption', captionInput.value);
+
+            try {
+                const response = await fetch('/api/v1/predict', { method: 'POST', body: formData });
+                if (!response.ok) throw new Error('Analysis failed');
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                alert('Analysis failed. Ensure backend is running.');
+                loadingState.classList.add('hidden');
+                loadingState.classList.remove('flex');
+                defaultState.classList.remove('hidden');
+                defaultState.classList.add('flex');
+                liveIndicator.classList.add('hidden');
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = `<span>Analyze Media</span><i class="fa-solid fa-arrow-right ml-2 text-sm opacity-80"></i>`;
+            }
+        });
+
+        function displayResults(data) {
             loadingState.classList.add('hidden');
             loadingState.classList.remove('flex');
-            defaultState.classList.remove('hidden');
-        } finally {
-            analyzeBtn.disabled = false;
-        }
-    });
+            resultsState.classList.remove('hidden');
+            resultsState.classList.add('flex');
+            liveIndicator.classList.add('hidden');
 
-    function displayResults(data) {
-        // Hide loading, show results
-        loadingState.classList.add('hidden');
-        loadingState.classList.remove('flex');
-        resultsState.classList.remove('hidden');
-        resultsState.classList.add('flex');
-
-        // Verdict
-        const verdictEl = document.getElementById('verdict-text');
-        verdictEl.innerText = data.verdict.toUpperCase();
-        verdictEl.className = 'text-3xl font-extrabold mb-2'; // reset
-        if (data.label === 1) verdictEl.classList.add('verdict-ai');
-        else if (data.label === 0) verdictEl.classList.add('verdict-real');
-        else verdictEl.classList.add('verdict-uncertain');
-
-        // Confidence
-        document.getElementById('confidence-text').innerText = (data.confidence * 100).toFixed(1) + '%';
-        
-        // Explanation
-        document.getElementById('explanation-text').innerText = data.explanation;
-
-        // Visual Evidence
-        if (data.heatmap_base64) {
-            document.getElementById('heatmap-preview').src = 'data:image/jpeg;base64,' + data.heatmap_base64;
-        }
-        if (data.frequency_base64) {
-            document.getElementById('freq-preview').src = 'data:image/jpeg;base64,' + data.frequency_base64;
-        }
-        if (data.ela_base64) {
-            document.getElementById('ela-preview').src = 'data:image/jpeg;base64,' + data.ela_base64;
-        }
-
-        // Robustness
-        const robList = document.getElementById('robustness-list');
-        robList.innerHTML = '';
-        if (data.robustness) {
-            const stable = data.robustness.stable_under_jpeg ? 
-                '<span class="text-green-400"><i class="fa-solid fa-check mr-1"></i>Stable</span>' : 
-                '<span class="text-red-400"><i class="fa-solid fa-xmark mr-1"></i>Unstable</span>';
-            robList.innerHTML += `<li>JPEG Compression: ${stable}</li>`;
+            // Verdict Styling
+            const verdictEl = document.getElementById('verdict-text');
+            verdictEl.innerText = data.verdict.toUpperCase();
             
-            if (data.robustness.jpeg_50_prob !== undefined) {
-                 robList.innerHTML += `<li>Degraded Conf: ${(data.robustness.jpeg_50_prob*100).toFixed(0)}%</li>`;
+            verdictEl.className = 'text-3xl md:text-4xl font-extrabold tracking-tight'; // Reset
+            
+            if (data.label === 1) {
+                verdictEl.classList.add('text-red-400');
+            } else if (data.label === 0) {
+                verdictEl.classList.add('text-green-400');
+            } else {
+                verdictEl.classList.add('text-amber-400');
             }
-        } else {
-            robList.innerHTML = '<li>Tests skipped</li>';
-        }
 
-        // Provenance
-        const provList = document.getElementById('provenance-list');
-        provList.innerHTML = '';
-        if (data.metadata) {
-            provList.innerHTML += `<li>C2PA: ${data.metadata.c2pa_detected ? '<span class="text-green-400">Detected</span>' : 'None'}</li>`;
-            provList.innerHTML += `<li>AI Software tags: ${data.metadata.ai_software_detected ? '<span class="text-red-400">Found</span>' : 'Clear'}</li>`;
-            if (data.metadata.format) {
-                provList.innerHTML += `<li>Format: ${data.metadata.format}</li>`;
+            document.getElementById('confidence-text').innerText = (data.confidence * 100).toFixed(1) + '%';
+            document.getElementById('explanation-text').innerText = data.explanation;
+
+            if (data.heatmap_base64) document.getElementById('heatmap-preview').src = 'data:image/jpeg;base64,' + data.heatmap_base64;
+            if (data.frequency_base64) document.getElementById('freq-preview').src = 'data:image/jpeg;base64,' + data.frequency_base64;
+            if (data.ela_base64) document.getElementById('ela-preview').src = 'data:image/jpeg;base64,' + data.ela_base64;
+
+            const robList = document.getElementById('robustness-list');
+            robList.innerHTML = '';
+            if (data.robustness) {
+                const stable = data.robustness.stable_under_jpeg 
+                    ? '<span class="text-green-400"><i class="fa-solid fa-check-circle mr-1"></i>Passed</span>' 
+                    : '<span class="text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Failed</span>';
+                robList.innerHTML += `<li class="flex justify-between border-b border-white/5 pb-2"><span>JPEG Compression</span> ${stable}</li>`;
+                if (data.robustness.jpeg_50_prob !== undefined) {
+                     robList.innerHTML += `<li class="flex justify-between pt-1"><span>Post-compression score</span> <span class="text-white">${(data.robustness.jpeg_50_prob*100).toFixed(0)}%</span></li>`;
+                }
+            } else {
+                robList.innerHTML = '<li>Tests skipped</li>';
+            }
+
+            const provList = document.getElementById('provenance-list');
+            provList.innerHTML = '';
+            if (data.metadata) {
+                provList.innerHTML += `<li class="flex justify-between border-b border-white/5 pb-2"><span>C2PA Signature</span> ${data.metadata.c2pa_detected ? '<span class="text-green-400">Verified</span>' : '<span class="text-zinc-500">Missing</span>'}</li>`;
+                provList.innerHTML += `<li class="flex justify-between border-b border-white/5 py-2"><span>AI Tag</span> ${data.metadata.ai_software_detected ? '<span class="text-red-400">Found</span>' : '<span class="text-zinc-500">Clear</span>'}</li>`;
+                if (data.metadata.format) provList.innerHTML += `<li class="flex justify-between pt-1"><span>File format</span> <span class="text-white">${data.metadata.format}</span></li>`;
             }
         }
-    }
-</script>
-
+    </script>
 </body>
 </html>
