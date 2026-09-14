@@ -107,12 +107,15 @@ def create_manifest(data_dir: str, metadata_csv: Optional[str] = None) -> List[D
             manifest.append(row.to_dict())
     else:
         # Fallback to directory structure (e.g., data/real/, data/fake/)
-        for label_dir in ['real', 'fake']:
-            dir_path = os.path.join(data_dir, label_dir)
-            if not os.path.exists(dir_path):
+        for label_dir in os.listdir(data_dir):
+            if label_dir.lower() not in ['real', 'fake']:
                 continue
                 
-            label = 0 if label_dir == 'real' else 1
+            dir_path = os.path.join(data_dir, label_dir)
+            if not os.path.isdir(dir_path):
+                continue
+                
+            label = 0 if label_dir.lower() == 'real' else 1
             for img_name in os.listdir(dir_path):
                 if img_name.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
                     manifest.append({
