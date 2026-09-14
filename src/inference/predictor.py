@@ -89,6 +89,18 @@ class SignalScopePredictor:
             calibrated_prob, evidence, robustness_results, metadata
         )
         
+        import cv2
+        import numpy as np
+        import base64
+        
+        # Overlay heatmap
+        img_np = np.array(image)
+        overlay = generate_overlay(img_np, cam_heatmap)
+        
+        # Convert to Base64
+        _, buffer = cv2.imencode('.jpg', cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
+        overlay_b64 = base64.b64encode(buffer).decode('utf-8')
+        
         return {
             "verdict": verdict,
             "label": 1 if calibrated_prob > 0.5 else 0,
@@ -108,7 +120,6 @@ class SignalScopePredictor:
             "robustness": robustness_results,
             "explanation": explanation_text,
             
-            # Note: In a real API, heatmaps are saved/returned as Base64. 
-            # We omit the actual huge byte arrays here for simplicity.
-            "artifacts_generated": True
+            "artifacts_generated": True,
+            "heatmap_base64": overlay_b64
         }

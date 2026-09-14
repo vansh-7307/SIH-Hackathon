@@ -117,6 +117,13 @@
                 </div>
 
                 <div class="mb-4">
+                    <h3 class="font-bold text-slate-200 mb-2"><i class="fa-solid fa-eye mr-2 text-blue-400"></i>Visual Evidence (Grad-CAM)</h3>
+                    <div class="bg-black/40 rounded-lg p-2 border border-slate-700">
+                        <img id="heatmap-preview" class="w-full rounded object-contain max-h-48" src="" alt="Heatmap Evidence">
+                    </div>
+                </div>
+
+                <div class="mb-4">
                     <h3 class="font-bold text-slate-200 mb-2"><i class="fa-solid fa-align-left mr-2 text-blue-400"></i>Explanation</h3>
                     <div class="bg-slate-800/50 rounded-lg p-4 text-slate-300 text-sm leading-relaxed" id="explanation-text">
                         The system detected anomalies consistent with synthesis. Several localized high-frequency regions contributed to the AI-generated score.
@@ -282,6 +289,11 @@
         
         // Explanation
         document.getElementById('explanation-text').innerText = data.explanation;
+
+        // Heatmap
+        if (data.heatmap_base64) {
+            document.getElementById('heatmap-preview').src = 'data:image/jpeg;base64,' + data.heatmap_base64;
+        }
 
         // Robustness
         const robList = document.getElementById('robustness-list');
