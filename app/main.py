@@ -1,10 +1,11 @@
 import os
 import yaml
+import shutil
+from typing import Optional
 from fastapi import FastAPI, File, UploadFile, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import shutil
-from typing import Dict, Any, Optional
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from src.inference.predictor import SignalScopePredictor
 
@@ -50,6 +51,8 @@ async def predict_image(
         raise HTTPException(status_code=400, detail="File must be an image.")
         
     temp_path = f"/tmp/{file.filename}"
+    os.makedirs("/tmp", exist_ok=True)
+    
     try:
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
@@ -60,6 +63,16 @@ async def predict_image(
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
+
+# Serve the frontend UI
+os.makedirs("app/ui", exist_ok=True)
+
+@app.get("/")
+async def serve_ui():
+    ui_path = "app/ui/index.html"
+    if os.path.exists(ui_path):
+        return FileResponse(ui_path)
+    return {"message": "UI not found. Please create app/ui/index.html"}
 
 if __name__ == "__main__":
     import uvicorn
