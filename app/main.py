@@ -50,8 +50,11 @@ async def predict_image(
     if not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail="File must be an image.")
         
-    temp_path = f"/tmp/{file.filename}"
-    os.makedirs("/tmp", exist_ok=True)
+    import tempfile
+    
+    # Use a secure temp directory
+    temp_dir = tempfile.gettempdir()
+    temp_path = os.path.join(temp_dir, file.filename)
     
     try:
         with open(temp_path, "wb") as buffer:
