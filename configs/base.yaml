@@ -1,0 +1,10 @@
+# Base configuration
+project_name: signalscope
+seed: 42
+device: auto
+
+# Directories
+data_dir: data/
+model_dir: model/weights/
+artifacts_dir: artifacts/
+logs_dir: artifacts/experiments/

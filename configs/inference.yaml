@@ -1,0 +1,33 @@
+# Inference Configuration
+batch_size: 1
+num_workers: 2
+
+# Thresholds
+thresholds:
+  high: 0.8
+  low: 0.2
+
+# Explainability
+explainability:
+  enabled: true
+  method: "gradcam"
+  target_layer: "features[-1]"
+
+# Robustness
+robustness:
+  enabled: true
+  tests:
+    - name: "jpeg_95"
+      type: "jpeg"
+      quality: 95
+    - name: "jpeg_50"
+      type: "jpeg"
+      quality: 50
+    - name: "blur"
+      type: "gaussian_blur"
+      kernel_size: 3
+      sigma: 1.0
+
+# Calibration
+calibration:
+  method: "temperature_scaling"

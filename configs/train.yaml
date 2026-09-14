@@ -1,0 +1,28 @@
+# Training Configuration
+batch_size: 32
+epochs: 20
+learning_rate: 0.0001
+weight_decay: 0.01
+
+# Model Architecture
+model:
+  spatial_backbone: "convnext_tiny"
+  pretrained: true
+  freeze_backbone_epochs: 2
+  use_frequency: true
+  use_artifact: true
+  fusion_method: "attention"
+
+# Loss
+loss:
+  type: "bce"
+  focal_gamma: 2.0
+  frequency_weight: 0.1
+
+# Optimization
+optimizer: "adamw"
+scheduler: "cosine"
+early_stopping_patience: 5
+
+# Data augmentation
+augmentation: configs/augmentation.yaml

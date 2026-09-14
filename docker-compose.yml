@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./model/weights:/app/model/weights
+    environment:
+      - SIGNALSCOPE_ENV=production
+      - SIGNALSCOPE_DEVICE=cpu
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    restart: unless-stopped
