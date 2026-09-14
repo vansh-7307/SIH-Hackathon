@@ -117,9 +117,20 @@
                 </div>
 
                 <div class="mb-4">
-                    <h3 class="font-bold text-slate-200 mb-2"><i class="fa-solid fa-eye mr-2 text-blue-400"></i>Visual Evidence (Grad-CAM)</h3>
-                    <div class="bg-black/40 rounded-lg p-2 border border-slate-700">
-                        <img id="heatmap-preview" class="w-full rounded object-contain max-h-48" src="" alt="Heatmap Evidence">
+                    <h3 class="font-bold text-slate-200 mb-2"><i class="fa-solid fa-eye mr-2 text-blue-400"></i>Visual Evidence & Multi-Spectral Analysis</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-black/40 rounded-lg p-2 border border-slate-700 flex flex-col">
+                            <p class="text-xs text-center text-slate-400 font-bold mb-1">Grad-CAM Spatial</p>
+                            <img id="heatmap-preview" class="w-full rounded object-contain max-h-40 flex-grow" src="" alt="Heatmap Evidence">
+                        </div>
+                        <div class="bg-black/40 rounded-lg p-2 border border-slate-700 flex flex-col">
+                            <p class="text-xs text-center text-slate-400 font-bold mb-1">Frequency Spectrum (2D FFT)</p>
+                            <img id="freq-preview" class="w-full rounded object-contain max-h-40 flex-grow" src="" alt="Frequency Evidence">
+                        </div>
+                        <div class="bg-black/40 rounded-lg p-2 border border-slate-700 flex flex-col">
+                            <p class="text-xs text-center text-slate-400 font-bold mb-1">Error Level Analysis (ELA)</p>
+                            <img id="ela-preview" class="w-full rounded object-contain max-h-40 flex-grow" src="" alt="ELA Evidence">
+                        </div>
                     </div>
                 </div>
 
@@ -290,9 +301,15 @@
         // Explanation
         document.getElementById('explanation-text').innerText = data.explanation;
 
-        // Heatmap
+        // Visual Evidence
         if (data.heatmap_base64) {
             document.getElementById('heatmap-preview').src = 'data:image/jpeg;base64,' + data.heatmap_base64;
+        }
+        if (data.frequency_base64) {
+            document.getElementById('freq-preview').src = 'data:image/jpeg;base64,' + data.frequency_base64;
+        }
+        if (data.ela_base64) {
+            document.getElementById('ela-preview').src = 'data:image/jpeg;base64,' + data.ela_base64;
         }
 
         // Robustness

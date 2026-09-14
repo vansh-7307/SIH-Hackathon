@@ -92,14 +92,45 @@ class SignalScopePredictor:
         import cv2
         import numpy as np
         import base64
+        import io
+        from src.features.frequency import extract_frequency_spectrum
+        from PIL import ImageChops, ImageEnhance
         
-        # Overlay heatmap
+        # 1. Grad-CAM Overlay
         img_np = np.array(image)
         overlay = generate_overlay(img_np, cam_heatmap)
-        
-        # Convert to Base64
         _, buffer = cv2.imencode('.jpg', cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
         overlay_b64 = base64.b64encode(buffer).decode('utf-8')
+        
+        # 2. Frequency Spectrum Visualization
+        # Use our existing feature extractor
+        freq_tensor = extract_frequency_spectrum(x)
+        freq_np = freq_tensor[0, 0].cpu().numpy()
+        # Normalize for visualization
+        freq_viz = np.uint8(255 * (freq_np - freq_np.min()) / (freq_np.max() - freq_np.min() + 1e-8))
+        freq_color = cv2.applyColorMap(freq_viz, cv2.COLORMAP_VIRIDIS)
+        _, freq_buffer = cv2.imencode('.jpg', freq_color)
+        freq_b64 = base64.b64encode(freq_buffer).decode('utf-8')
+        
+        # 3. Error Level Analysis (ELA)
+        # Re-save image at a known quality (e.g. 90) and find absolute difference
+        ela_temp = io.BytesIO()
+        image.save(ela_temp, 'JPEG', quality=90)
+        ela_temp.seek(0)
+        resaved_img = Image.open(ela_temp)
+        
+        ela_diff = ImageChops.difference(image, resaved_img)
+        extrema = ela_diff.getextrema()
+        max_diff = max([ex[1] for ex in extrema]) if extrema else 255
+        if max_diff == 0:
+            max_diff = 1
+            
+        scale = 255.0 / max_diff
+        ela_img = ImageEnhance.Brightness(ela_diff).enhance(scale)
+        
+        ela_buffer = io.BytesIO()
+        ela_img.save(ela_buffer, format="JPEG")
+        ela_b64 = base64.b64encode(ela_buffer.getvalue()).decode('utf-8')
         
         return {
             "verdict": verdict,
@@ -121,5 +152,7 @@ class SignalScopePredictor:
             "explanation": explanation_text,
             
             "artifacts_generated": True,
-            "heatmap_base64": overlay_b64
+            "heatmap_base64": overlay_b64,
+            "frequency_base64": freq_b64,
+            "ela_base64": ela_b64
         }
