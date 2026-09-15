@@ -190,12 +190,17 @@
                         </button>
                     </div>
 
-                    <button id="analyze-btn" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
+                    <!-- Optional Caption Input (Module E) -->
+                    <div class="mt-4 no-print">
+                        <label for="caption-input" class="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2"><i class="fa-solid fa-align-left mr-1"></i> Optional Context / Caption</label>
+                        <input type="text" id="caption-input" placeholder="e.g., 'A real photograph of a coffee mug'" class="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-sm text-white outline-none focus:border-indigo-500 transition">
+                    </div>
+
+                    <button id="analyze-btn" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center no-print">
                         <span>Analyze Media</span>
                         <i class="fa-solid fa-arrow-right ml-2 text-sm opacity-80"></i>
                     </button>
                 </div>
-
                 <!-- Metadata / Input details Bento -->
                 <div class="bento-card p-6">
                     <label class="block text-sm font-bold text-white mb-2">Metadata Context</label>
@@ -508,7 +513,22 @@ print(response.json())
             }
 
             document.getElementById('confidence-text').innerText = (data.confidence * 100).toFixed(1) + '%';
-            document.getElementById('explanation-text').innerText = data.evidence || data.explanation || 'No evidence provided.';
+            
+            // Attribution & Evidence
+            let evidenceHTML = `<p class="mb-4">${data.evidence || data.explanation || 'No evidence provided.'}</p>`;
+            if (data.attribution) {
+                const attrColor = data.attribution.includes('Camera') ? 'text-green-400' : (data.attribution === 'Unknown' ? 'text-amber-400' : 'text-red-400');
+                evidenceHTML += `<div class="bg-white/5 border border-white/10 rounded-lg p-3 inline-flex items-center"><i class="fa-solid fa-microchip mr-2 text-zinc-400"></i><span class="text-xs text-zinc-400 uppercase tracking-widest mr-2">Generator Attribution:</span><span class="text-sm font-bold ${attrColor}">${data.attribution}</span></div>`;
+            }
+            
+            // Multimodal Text Consistency
+            if (data.multimodal) {
+                const multiColor = data.multimodal.match ? 'text-green-400' : 'text-red-400';
+                const multiIcon = data.multimodal.match ? 'fa-check-circle' : 'fa-triangle-exclamation';
+                evidenceHTML += `<div class="mt-3 bg-white/5 border border-white/10 rounded-lg p-3 inline-flex flex-col"><div class="flex items-center mb-1"><i class="fa-solid ${multiIcon} mr-2 ${multiColor}"></i><span class="text-xs text-zinc-400 uppercase tracking-widest mr-2">Multimodal Consistency:</span><span class="text-sm font-bold ${multiColor}">${(data.multimodal.score * 100).toFixed(0)}% Match</span></div><span class="text-xs text-zinc-300">${data.multimodal.analysis}</span></div>`;
+            }
+            
+            document.getElementById('explanation-text').innerHTML = evidenceHTML;
 
             if (data.heatmap_base64) document.getElementById('heatmap-preview').src = 'data:image/jpeg;base64,' + data.heatmap_base64;
             if (data.frequency_base64) document.getElementById('freq-preview').src = 'data:image/jpeg;base64,' + data.frequency_base64;
