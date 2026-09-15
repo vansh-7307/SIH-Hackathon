@@ -1,20 +1,23 @@
 batch_size: 1
 calibration:
   method: temperature_scaling
-calibration_temp: 1.1585817337036133
+calibration_temp: 0.9964393377304077
+dataset_version: 3000_images
 explainability:
   enabled: true
   method: gradcam
   target_layer: features[-1]
+fake_count: 1500
 model:
   freeze_backbone_epochs: 2
   fusion_method: attention
   pretrained: true
   spatial_backbone: convnext_tiny
-  use_artifact: false
-  use_frequency: false
-model_path: artifacts/models/baseline_best.pt
+  use_artifact: true
+  use_frequency: true
+model_path: artifacts/models/signalscope_best.pt
 num_workers: 2
+real_count: 1500
 robustness:
   enabled: true
   tests:

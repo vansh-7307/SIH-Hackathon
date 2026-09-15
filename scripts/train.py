@@ -214,8 +214,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str, default='data/Tiny-GenImage')
     parser.add_argument('--config', type=str, default='configs/train.yaml')
-    parser.add_argument('--experiment', type=str, default='Full SignalScope model', help='Name of experiment')
+    parser.add_argument('--experiment', type=str, default='Full SignalScope model 3K', help='Name of experiment')
     parser.add_argument('--baseline', action='store_true', help='Force spatial baseline mode')
+    parser.add_argument('--resume', type=str, default=None, help='Path to checkpoint to fine-tune from')
     args = parser.parse_args()
     
     torch.manual_seed(42)
@@ -256,6 +257,10 @@ def main():
     unseen_loader = DataLoader(unseen_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
     
     model = SignalScopeModel(config.get('model', {})).to(device)
+    
+    if args.resume and os.path.exists(args.resume):
+        print(f"Resuming/fine-tuning from checkpoint: {args.resume}")
+        model.load_state_dict(torch.load(args.resume, weights_only=True, map_location=device))
     
     # Overfitting prevention setup
     weight_decay = config.get('weight_decay', 0.01)
