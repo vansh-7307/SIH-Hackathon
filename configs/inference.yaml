@@ -1,33 +1,33 @@
-# Inference Configuration
 batch_size: 1
-num_workers: 2
-
-# Thresholds
-thresholds:
-  high: 0.8
-  low: 0.2
-
-# Explainability
+calibration:
+  method: temperature_scaling
+calibration_temp: 1.1585817337036133
 explainability:
   enabled: true
-  method: "gradcam"
-  target_layer: "features[-1]"
-
-# Robustness
+  method: gradcam
+  target_layer: features[-1]
+model:
+  freeze_backbone_epochs: 2
+  fusion_method: attention
+  pretrained: true
+  spatial_backbone: convnext_tiny
+  use_artifact: false
+  use_frequency: false
+model_path: artifacts/models/baseline_best.pt
+num_workers: 2
 robustness:
   enabled: true
   tests:
-    - name: "jpeg_95"
-      type: "jpeg"
-      quality: 95
-    - name: "jpeg_50"
-      type: "jpeg"
-      quality: 50
-    - name: "blur"
-      type: "gaussian_blur"
-      kernel_size: 3
-      sigma: 1.0
-
-# Calibration
-calibration:
-  method: "temperature_scaling"
+  - name: jpeg_95
+    quality: 95
+    type: jpeg
+  - name: jpeg_50
+    quality: 50
+    type: jpeg
+  - kernel_size: 3
+    name: blur
+    sigma: 1.0
+    type: gaussian_blur
+thresholds:
+  high: 0.8
+  low: 0.2
