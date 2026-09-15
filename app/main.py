@@ -33,7 +33,7 @@ def get_predictor():
         with open('configs/inference.yaml', 'r') as f:
             config = yaml.safe_load(f)
             
-        model_path = os.getenv('SIGNALSCOPE_MODEL_PATH', 'model/weights/best_model.pt')
+        model_path = os.getenv('SIGNALSCOPE_MODEL_PATH', config.get('model_path', 'model/weights/best_model.pt'))
         predictor = SignalScopePredictor(config, model_path)
     return predictor
 
