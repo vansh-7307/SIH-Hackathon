@@ -68,3 +68,8 @@ venv.bak/
 *.webp
 !/artifacts/figures/
 !/report/explanation_samples/
+
+# Ignore large model weights and raw data
+artifacts/models/
+artifacts/data/
+*.pt
