@@ -9,13 +9,13 @@ explainability:
   target_layer: features[-1]
 fake_count: 1500
 model:
-  freeze_backbone_epochs: 2
+  freeze_backbone_epochs: 1
   fusion_method: attention
   pretrained: true
-  spatial_backbone: convnext_tiny
+  spatial_backbone: convnext_base
   use_artifact: true
   use_frequency: true
-model_path: artifacts/models/signalscope_best.pt
+model_path: artifacts/models/convnext_base_heavy/best_model.pt
 num_workers: 2
 real_count: 1500
 robustness:
