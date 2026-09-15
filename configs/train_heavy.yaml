@@ -1,0 +1,16 @@
+# Heavy Training Configuration for CPU
+batch_size: 8
+epochs: 3
+learning_rate: 0.00005
+weight_decay: 0.05
+
+model:
+  spatial_backbone: "convnext_base" # Much heavier, better accuracy, avoids ViT 3D tensor issues
+  pretrained: true
+  freeze_backbone_epochs: 1
+  use_frequency: true
+  use_artifact: true
+  fusion_method: "attention"
+
+calibration:
+  method: "temperature_scaling"
