@@ -64,7 +64,7 @@ Our model was evaluated strictly on a held-out test set, deliberately holding ou
 
 ## 6. Links
 - **Interactive API Documentation:** Automatically hosted at `http://localhost:8000/docs` when running the app.
-- **Demo Video:** [Insert YouTube / Drive Link Here]
+- **Demo Video:** https://youtu.be/hLMDA7sOjWs
 
 ---
 *Originality Declaration: All code was written for SIH 2026. Pre-trained weights for the `convnext_tiny` spatial backbone were sourced from `timm` (PyTorch Image Models).*
