@@ -62,6 +62,28 @@ async def predict_image(
             
         result = pred.predict(temp_path, caption)
         
+        # --- FEATURE: Metadata & EXIF Analysis ---
+        from PIL import Image, ExifTags
+        exif_report = {"has_exif": False, "suspicious": False, "details": {}}
+        try:
+            with Image.open(temp_path) as img:
+                exif = img.getexif()
+                if exif:
+                    exif_report["has_exif"] = True
+                    for tag_id, value in exif.items():
+                        tag = ExifTags.TAGS.get(tag_id, tag_id)
+                        if isinstance(value, bytes):
+                            try: value = value.decode()
+                            except: value = "Binary Data"
+                        exif_report["details"][tag] = str(value)
+                        # Flag suspicious tags common in AI generators
+                        if any(ai_tag in str(value).lower() for ai_tag in ['midjourney', 'dall-e', 'stable diffusion', 'comfyui', 'automatic1111']):
+                            exif_report["suspicious"] = True
+        except Exception as e:
+            pass
+        
+        result["metadata_analysis"] = exif_report
+        
         # --- SECRET HACKATHON DEMO OVERRIDE ---
         # Allows for a flawless live presentation by intercepting specific filenames
         fn = file.filename.lower()

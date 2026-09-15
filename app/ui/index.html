@@ -269,12 +269,20 @@
                         <!-- ELA -->
                         <div class="bg-black/30 rounded-xl overflow-hidden border border-white/5 flex flex-col">
                             <div class="p-3 border-b border-white/5 bg-white/[0.02]">
-                                <p class="text-xs font-bold text-zinc-300 text-center">Error Level (ELA)</p>
+                                <p class="text-xs font-bold text-zinc-300 text-center">Error Level Analysis</p>
                             </div>
                             <div class="p-2 flex-grow flex items-center justify-center bg-black">
                                 <img id="ela-preview" class="w-full h-32 object-cover rounded-lg" src="" alt="ELA">
                             </div>
                         </div>
+                    </div>
+
+                    <!-- NEW FEATURE: Metadata Analysis -->
+                    <h3 class="text-sm font-bold text-white mb-3 flex items-center mt-4">
+                        <i class="fa-solid fa-file-code text-blue-400 mr-2"></i> File Metadata Analysis
+                    </h3>
+                    <div class="bg-black/40 rounded-xl p-4 border border-white/5 mb-8 text-sm">
+                        <div id="metadata-content" class="text-zinc-400">Loading metadata...</div>
                     </div>
 
                     <!-- Bottom Details -->
@@ -429,6 +437,20 @@
                 }
             } else {
                 robList.innerHTML = '<li>Tests skipped</li>';
+            }
+
+            // Fill Metadata
+            const metaEl = document.getElementById('metadata-content');
+            if (data.metadata_analysis) {
+                if (data.metadata_analysis.suspicious) {
+                    metaEl.innerHTML = '<span class="text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> <b>Suspicious Software Tags Detected:</b></span> This file contains EXIF tags associated with AI generative software (e.g., Midjourney, Stable Diffusion).';
+                } else if (!data.metadata_analysis.has_exif) {
+                    metaEl.innerHTML = '<span class="text-amber-400"><i class="fa-solid fa-info-circle mr-1"></i> <b>No Hardware EXIF Data Found:</b></span> Real camera photos typically contain EXIF data (camera model, exposure, etc.). Its absence suggests the image was likely saved from the web, compressed by a social media platform, or synthesized by AI.';
+                } else {
+                    metaEl.innerHTML = '<span class="text-green-400"><i class="fa-solid fa-camera mr-1"></i> <b>Standard EXIF Found:</b></span> The file contains standard EXIF metadata (camera settings). While EXIF can be faked, this is a positive indicator of authenticity.';
+                }
+            } else {
+                metaEl.innerHTML = 'Metadata analysis unavailable.';
             }
 
             const provList = document.getElementById('provenance-list');
