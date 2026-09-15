@@ -196,7 +196,19 @@
                         <input type="text" id="caption-input" placeholder="e.g., 'A real photograph of a coffee mug'" class="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-sm text-white outline-none focus:border-indigo-500 transition">
                     </div>
 
-                    <button id="analyze-btn" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center no-print">
+                    <!-- Module G: Active Defense Toggle -->
+                    <div class="mt-4 mb-2 flex items-center justify-between bg-black/40 border border-white/10 rounded-lg p-3 no-print cursor-pointer hover:bg-white/5 transition" onclick="const cb = document.getElementById('defense-toggle'); cb.checked = !cb.checked;">
+                        <div>
+                            <p class="text-sm font-bold text-white flex items-center"><i class="fa-solid fa-shield-halved text-emerald-400 mr-2"></i> Adversarial Noise Scrubber</p>
+                            <p class="text-xs text-zinc-500">Enable spatial smoothing to neutralize adversarial FGSM attacks.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer pointer-events-none">
+                            <input type="checkbox" id="defense-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+
+                    <button id="analyze-btn" class="w-full mt-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center no-print">
                         <span>Analyze Media</span>
                         <i class="fa-solid fa-arrow-right ml-2 text-sm opacity-80"></i>
                     </button>
@@ -472,6 +484,8 @@ print(response.json())
             const formData = new FormData();
             formData.append('file', currentFile);
             if (captionInput.value) formData.append('caption', captionInput.value);
+            const scrubNoise = document.getElementById('defense-toggle').checked;
+            if (scrubNoise) formData.append('scrub_noise', 'true');
 
             try {
                 const response = await fetch('/api/v1/predict', { method: 'POST', body: formData });

@@ -45,20 +45,31 @@ async def health_check():
 async def predict_image(
     file: UploadFile = File(...), 
     caption: Optional[str] = None,
+    scrub_noise: bool = False,
     pred: SignalScopePredictor = Depends(get_predictor)
 ):
     if not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail="File must be an image.")
         
     import tempfile
+    from PIL import Image, ExifTags, ImageFilter
     
     # Use a secure temp directory
     temp_dir = tempfile.gettempdir()
     temp_path = os.path.join(temp_dir, file.filename)
     
     try:
+        # Save the incoming file
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
+            
+        # --- FEATURE: Active Defense Noise Scrubber (Module G) ---
+        if scrub_noise:
+            with Image.open(temp_path) as img:
+                # Apply a slight blur to wash out high-frequency adversarial noise
+                scrubbed = img.filter(ImageFilter.GaussianBlur(radius=1.5))
+                scrubbed.save(temp_path, quality=100)
+        # ---------------------------------------------------------
             
         result = pred.predict(temp_path, caption)
         
