@@ -402,16 +402,16 @@
             
             verdictEl.className = 'text-3xl md:text-4xl font-extrabold tracking-tight'; // Reset
             
-            if (data.label === 1) {
+            if (data.verdict.toUpperCase() === 'FAKE' || data.verdict.toUpperCase() === 'LIKELY AI') {
                 verdictEl.classList.add('text-red-400');
-            } else if (data.label === 0) {
+            } else if (data.verdict.toUpperCase() === 'REAL' || data.verdict.toUpperCase() === 'LIKELY REAL') {
                 verdictEl.classList.add('text-green-400');
             } else {
                 verdictEl.classList.add('text-amber-400');
             }
 
             document.getElementById('confidence-text').innerText = (data.confidence * 100).toFixed(1) + '%';
-            document.getElementById('explanation-text').innerText = data.explanation;
+            document.getElementById('explanation-text').innerText = data.evidence || data.explanation || 'No evidence provided.';
 
             if (data.heatmap_base64) document.getElementById('heatmap-preview').src = 'data:image/jpeg;base64,' + data.heatmap_base64;
             if (data.frequency_base64) document.getElementById('freq-preview').src = 'data:image/jpeg;base64,' + data.frequency_base64;
